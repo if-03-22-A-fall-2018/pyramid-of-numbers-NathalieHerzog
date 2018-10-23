@@ -97,8 +97,12 @@ void copy_big_int(const struct BigInt *from, struct BigInt *to);
 */
 int main(int argc, char *argv[])
 {
-	printf("Base Number: ");
-	scanf("%s", &the_int);
+	char input[MAX_DIGITS];
 
-	strobig_int(*str, len, *big_int);
+	printf("Base Number: ");
+	scanf("%s", input);
+
+	strtobig_int(input,strlen(input), &bigint );
+
+	return 0;
 }
