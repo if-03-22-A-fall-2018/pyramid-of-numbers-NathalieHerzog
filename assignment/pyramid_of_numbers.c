@@ -1,9 +1,9 @@
 /*----------------------------------------------------------
  *				HTBLA-Leonding / Class: <your class>
  * ---------------------------------------------------------
- * Exercise Number: 0
+ * Exercise Number: 5
  * Title:			Pyramid of Numbers
- * Author:			<your name>
+ * Author:			Nathalie Herzog
  * ----------------------------------------------------------
  * Description:
  * Calculates a pyramid of numbers, i.e., it multiplies a big
@@ -23,8 +23,6 @@
 struct BigInt {
 	/** number of digits of the big int. */
 	int digits_count;
-
-	/** array of digits of big int. */
 	unsigned int the_int[MAX_DIGITS];
 };
 
@@ -36,26 +34,49 @@ struct BigInt {
 *** @param *big_int The converted string now as BigInt.
 * @return The number of characters converted.
 */
-int strtobig_int(const char *str, int len, struct BigInt *big_int);
+int strtobig_int(const char *str, int len, struct BigInt *big_int)
+{
+	int counter;
+	for (size_t i = 0; i < len; i++) {
+		if(str[i] >= '0' && str[i]  <= '9')
+		{
+			big_int -> the_int[i] = str[i];
+			counter++;
+		}
+	}
+	return counter;
+}
 
 /** print_big_int() prints a BigInt.
 *** @param *big_int The BigInt to be printed.
 */
-void print_big_int(const struct BigInt *big_int);
+void print_big_int(const struct BigInt *big_int)
+{
+	printf("BigInt: %d/n", *big_int);
+
+}
 
 /** multiply() multiplies a BigInt by an int.
 *** @param big_int The BigInt to be multiplied.
 *** @param factor The int value which is multiplied by BigInt.
 *** @param *big_result The result of the multiplication.
 */
-void multiply(const struct BigInt *big_int, int factor, struct BigInt *big_result);
+void multiply(const struct BigInt *big_int, int factor, struct BigInt *big_result)
+{
+	*big_result = *big_int * factor;
+}
 
 /** divide() multiplies a BigInt by an int.
 *** @param big_int The BigInt to be divided.
 *** @param divisor The int value by which we want to devide big_int.
 *** @param *big_result The result of the division.
 */
-void divide(const struct BigInt *big_int, int divisor, struct BigInt *big_result);
+void divide(const struct BigInt *big_int, int divisor, struct BigInt *big_result)
+{
+	int toDivide = *big_int;
+
+	*big_result =  toDivide / divisor;
+}
 
 /** copy_big_int() copies a BigInt to another BigInt.
 *** @param from The source where we want to copy from.
@@ -66,7 +87,7 @@ void copy_big_int(const struct BigInt *from, struct BigInt *to);
 /**
 *** main() reads the base number from which the pyramid has to be calculated
 *** into an array of char. The max. length of this number is MAX_DIGITS.
-*** The number is checked to contain only digits. If not the program exits.
+*** The number is checked to contain only digits. If not, the program exits.
 *** Then the inputted number is converted into a big int by calling the
 *** function strtobig_int().
 *** After the conversion the tower is calculated by calling the functions
@@ -76,5 +97,8 @@ void copy_big_int(const struct BigInt *from, struct BigInt *to);
 */
 int main(int argc, char *argv[])
 {
-	return 0;
+	printf("Base Number: ");
+	scanf("%s", &the_int);
+
+	strobig_int(*str, len, *big_int);
 }
