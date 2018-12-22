@@ -12,7 +12,9 @@
  * again starting by 2, 3, etc.
  * ----------------------------------------------------------
  */
+
 #include <stdio.h>
+#include <string.h>
 
 /// The maximum number of digits allowed in a big int.
 #define MAX_DIGITS 80
@@ -20,11 +22,12 @@
 /** BigInt represents an integer number which can have MAX_DIGITS digits
 *** @see MAX_DIGITS
 */
-struct BigInt {
+struct BigInt
+{
 	/** number of digits of the big int. */
 	int digits_count;
 	unsigned int the_int[MAX_DIGITS];
-}
+};
 
 /** strtobig_int converts a string into a BigInt. If strtobig_int runs
 *** against a character not between '0' and '9' the conversion stops
@@ -36,15 +39,13 @@ struct BigInt {
 */
 int strtobig_int(const char *str, int len, struct BigInt *big_int)
 {
-	int counter;
-	for (size_t i = 0; i < len; i++) {
-		if(str[i] >= '0' && str[i]  <= '9')
-		{
-			big_int -> the_int[i] = str[i];
-			counter++;
-		}
+	for (int i = 0; i < len; i++)
+	{
+		big_int->the_int[i] = str[i] - '0';
+		big_int->digits_count++;
 	}
-	return counter;
+
+	return big_int->digits_count;
 }
 
 /** print_big_int() prints a BigInt.
@@ -52,11 +53,10 @@ int strtobig_int(const char *str, int len, struct BigInt *big_int)
 */
 void print_big_int(const struct BigInt *big_int)
 {
-	for (size_t i = 0; i < big_int->digits_count; i++) 
+	for (int i = 0; i < big_int->digits_count; i++)
 	{
 		printf("%d", big_int->the_int[i]);
 	}
-
 }
 
 /** multiply() multiplies a BigInt by an int.
@@ -66,7 +66,31 @@ void print_big_int(const struct BigInt *big_int)
 */
 void multiply(const struct BigInt *big_int, int factor, struct BigInt *big_result)
 {
+	int val;
+	int overflow = 0;
 
+	for (int i = big_int->digits_count - 1; i >= 0; i--)
+	{
+		val = (big_int->the_int[i] * factor) + overflow;
+		overflow = val / 10;
+		val = val % 10;
+		big_result->the_int[i + 1] = val;
+	}
+
+	if (overflow > 0)
+	{
+		big_result->the_int[0] = overflow;
+		big_result->digits_count = big_int->digits_count + 1;
+	}
+	else
+	{
+		big_result->digits_count = big_int->digits_count;
+
+		for (int i = 0; i < big_result->digits_count; i++)
+		{
+			big_result->the_int[i] = big_result->the_int[i + 1];
+		}
+	}
 }
 
 /** divide() multiplies a BigInt by an int.
@@ -76,7 +100,34 @@ void multiply(const struct BigInt *big_int, int factor, struct BigInt *big_resul
 */
 void divide(const struct BigInt *big_int, int divisor, struct BigInt *big_result)
 {
+	int val;
+	int overflow = 0;
 
+	if (divisor > big_int->the_int[0])
+	{
+		overflow = big_int->the_int[0];
+	}
+
+	for (int i = 0; i < big_int->digits_count; i++)
+	{
+		if ((divisor > big_int->the_int[i]) || overflow != 0)
+		{
+			val = (overflow * 10) + big_int->the_int[i];
+
+			big_result->the_int[i] = val / divisor;
+			overflow = big_int->the_int[i] % divisor;
+
+			big_result->digits_count = big_int->digits_count - 1;
+		}
+		else
+		{
+			val = big_int->the_int[i] / divisor;
+			overflow = big_int->the_int[i] % divisor;
+			big_result->the_int[i] = val;
+
+			big_result->digits_count = big_int->digits_count;
+		}
+	}
 }
 
 /** copy_big_int() copies a BigInt to another BigInt.
@@ -87,7 +138,7 @@ void copy_big_int(const struct BigInt *from, struct BigInt *to)
 {
 	to->digits_count = from->digits_count;
 
-	for(int i = 0; i < from->digits_count; i++)
+	for (int i = 0; i < from->digits_count; i++)
 	{
 		to->the_int[i] = from->the_int[i];
 	}
@@ -106,12 +157,34 @@ void copy_big_int(const struct BigInt *from, struct BigInt *to)
 */
 int main(int argc, char *argv[])
 {
-	char input[MAX_DIGITS];
+	struct BigInt big_int = {0, {0}};
+	struct BigInt big_result = {0, {0}};
+	char a_string[MAX_DIGITS];
 
 	printf("Base Number: ");
-	scanf("%s", &input);
+	scanf("%s", a_string);
 
-	strtobig_int(input,strlen(input), &bigint );
+	strtobig_int(a_string, strlen(a_string), &big_int);
+
+	for (int i = 2; i <= 9; i++)
+	{
+		multiply(&big_int, i, &big_result);
+		print_big_int(&big_int);
+		printf(" * %d = ", i);
+		copy_big_int(&big_result, &big_int);
+		print_big_int(&big_int);
+		printf("\n");
+	}
+
+	for (int i = 2; i <= 9; i++)
+	{
+		print_big_int(&big_int);
+		divide(&big_int, i, &big_result);
+		printf(" / %d = ", i);
+		copy_big_int(&big_result, &big_int);
+		print_big_int(&big_int);
+		printf("\n");
+	}
 
 	return 0;
 }
