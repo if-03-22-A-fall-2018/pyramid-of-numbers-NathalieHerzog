@@ -102,31 +102,38 @@ void divide(const struct BigInt *big_int, int divisor, struct BigInt *big_result
 {
 	int val;
 	int overflow = 0;
+	int ifBigger = 0;
+	int normal = 0;
 
 	if (divisor > big_int->the_int[0])
 	{
 		overflow = big_int->the_int[0];
+		big_result->digits_count = big_int->digits_count - 1;
+		ifBigger = 1;
+	}
+	else
+	{
+		big_result->digits_count = big_int->digits_count;
 	}
 
-	for (int i = 0; i < big_int->digits_count; i++)
+	for (int i = ifBigger; i < big_int->digits_count; i++)
 	{
 		if ((divisor > big_int->the_int[i]) || overflow != 0)
 		{
 			val = (overflow * 10) + big_int->the_int[i];
 
-			big_result->the_int[i] = val / divisor;
-			overflow = big_int->the_int[i] % divisor;
-
-			big_result->digits_count = big_int->digits_count - 1;
+			big_result->the_int[normal] = val / divisor;
+			overflow = val % divisor;
 		}
 		else
 		{
-			val = big_int->the_int[i] / divisor;
-			overflow = big_int->the_int[i] % divisor;
-			big_result->the_int[i] = val;
+			val = (overflow * 10) + big_int->the_int[i];
 
-			big_result->digits_count = big_int->digits_count;
+			big_result->the_int[normal] = val / divisor;
+			overflow = val % divisor;
 		}
+
+		normal++;
 	}
 }
 
